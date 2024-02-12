@@ -26,8 +26,6 @@ class CreateUserView(CreateAPIView):
     ]
     serializer_class = RegisterSerializer
 
-
-
 class UserList(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -35,6 +33,15 @@ class UserList(generics.ListAPIView):
 class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+class PostListCreateView(generics.ListCreateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 
 class PostList(generics.ListCreateAPIView):
     queryset = Post.objects.all()
@@ -53,6 +60,20 @@ class CommentListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated, IsCommentOwner]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+
+class CommentListCreateView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated, IsCommentOwner]
+
+    def get_queryset(self):
+        post_id = self.kwargs.get('post_id')
+        return Comment.objects.filter(post__id=post_id)
+
+    def perform_create(self, serializer):
+        post_id = self.kwargs.get('post_id')
+        post = generics.get_object_or_404(Post, pk=post_id)
+        serializer.save(user=self.request.user, post=post)
 
 class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated, IsCommentOwner]
