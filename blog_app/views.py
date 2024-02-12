@@ -2,6 +2,9 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from .serializers import UserSerializer
 from rest_framework import permissions
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsCommentOwner
+
 
 # Create your views here.
 from rest_framework import generics
@@ -47,11 +50,11 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PostSerializer
 
 class CommentListCreateView(generics.ListCreateAPIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOnlyRead]
+    permission_classes = [IsAuthenticated, IsCommentOwner]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
 class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOnlyRead]
+    permission_classes = [IsAuthenticated, IsCommentOwner]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
