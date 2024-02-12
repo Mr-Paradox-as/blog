@@ -25,5 +25,6 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    path('api-auth/',include(urls))
+    path('api-auth/',include(urls)),
+
 ]

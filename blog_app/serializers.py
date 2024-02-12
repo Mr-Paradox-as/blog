@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post, Category
+from .models import Post, Category, Comment
 from django.contrib.auth.models import User
 
 from rest_framework import serializers
@@ -42,7 +42,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    posts = serializers.PrimaryKeyRelatedField(many=True, queryset=Post.objects.all())
+    posts = serializers.PrimaryKeyRelatedField(many=True, queryset= Post.objects.all())
     owner = serializers.ReadOnlyField(source = 'owner.username')
     class Meta:
         model = User
@@ -56,11 +56,14 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ('id', 'name')
 
-
-
-        
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'post', 'user', 'content', 'created_at']
+        read_only_fields = ['id', 'created_at']
 
 class PostSerializer(serializers.ModelSerializer):
+    comments = CommentSerializer(many=True, read_only=True)
     class Meta:
         model = Post
-        fields = ('id', 'title', 'content', 'created_at', 'updated_at', 'category')
+        fields = ('id', 'title', 'content', 'created_at', 'updated_at', 'category', 'comments')
