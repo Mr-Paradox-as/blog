@@ -12,6 +12,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    owner = models.ForeignKey('auth.user',related_name='posts',on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
